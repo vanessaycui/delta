@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Layout, Model, TabNode, IJsonModel} from 'flexlayout-react'
 import * as dashboardsAPI from "../../utilities/dashboards-api";
 import * as entriesAPI from "../../utilities/entries-api";
 
@@ -9,6 +10,84 @@ import DashboardTable from "../../components/DashboardTable/DashboardTable";
 import Entries from "../../components/Entries/Entries";
 import DashboardChart from "../../components/DashboardChart/DashboardChart";
 import "./Dashboard.css";
+
+var json= {
+  global: {"tabEnableFloat": true},
+  borders: [
+    {
+       type: "border",
+       location: "left",
+       children: [
+           {
+               type: "tab",
+               enableClose: false,
+               name: "Navigation",
+               component: "grid",
+           }
+       ]
+   },
+   {
+       type: "border",
+       location: "right",
+       children: [
+           {
+               type: "tab",
+               enableClose: false,
+               name: "Options",
+               component: "grid",
+           }
+       ]
+   },
+   {
+       type: "border",
+       location: "bottom",
+       children: [
+           {
+               type: "tab",
+               enableClose: false,
+               name: "Activity Blotter",
+               component: "grid",
+           },
+           {
+               type: "tab",
+               enableClose: false,
+               name: "Execution Blotter",
+               component: "grid",
+           }
+       ]
+   }
+],
+  layout: {
+      type: "row",
+      weight: 100,
+      children: [
+          {
+              type: "tabset",
+              weight: 50,
+              children: [
+                  {
+                      type: "tab",
+                      name: "One",
+                      component: "DashboardChart",
+                  }
+              ]
+          },
+          {
+              type: "tabset",
+              weight: 50,
+              children: [
+                  {
+                      type: "tab",
+                      name: "Two",
+                      component: "DashboardTable",
+                  }
+              ]
+          }
+      ]
+  }
+};
+
+const model = Model.fromJson(json);
 
 export default function Dashboard({
   user,
@@ -81,6 +160,13 @@ export default function Dashboard({
   function changeEntryType(evt) {
     setFormType(evt.target.name);
     setShowEntryForm(true);
+  }
+
+  const factory = (node) => {
+    var component = node.getComponent()
+    if (component === "button"){
+      return <button>{node.getName()}</button>
+    }
   }
 
   return (
@@ -192,6 +278,8 @@ export default function Dashboard({
       ) : (
         <>You have no dashboards. Create a new one to start.</>
       )}
+
+      <Layout model={model} factory={factory}/>
     </div>
   );
 }
